@@ -98,19 +98,28 @@ def gamebox_merge_le():
                     if gamebox[i][a] == gamebox[i-1][a] and gamebox[i][a] !=0:
                         gamebox[i][a] *= 2
                         gamebox[i-1][a] = 0
+        a += 1
 
-def gamebox_order_le():
-    a = 0
-    while (a !=4):
-        for j in range(0,3):
-                for i in reversed(range(1,4)):
-                    if gamebox[i][a] == 0 and gamebox[i-1][a] !=0:
-                        gamebox[i][a] = gamebox[i-1][a]
-                        gamebox[i-1][a] = 0
 
-def gamebox_action():
-    print("action")
-    gamebox_order()
+def gamebox_action_bal():
+    gamebox_order_bal()
+    gamebox_merge_balra()
+    gamebox_order_bal()
+
+def gamebox_action_jobb():
+    gamebox_order_jobb()
+    gamebox_merge_jobbra()
+    gamebox_order_jobb():
+
+def gamebox_action_fel():
+    gamebox_order_fel()
+    gamebox_merge_fel()
+    gamebox_order_fel()
+
+def gamebox_action_le():
+    gamebox_order_le()
+    gamebox_merge_le()
+    gamebox_order_le()
 
 
 
@@ -127,9 +136,7 @@ def gamebox_validate():
 #~~~~~~~~~~main program~~~~~~~~~~~~
 
 gamebox_draw()
-gamebox_order_le()
-gamebox_merge_le()
-gamebox_order_le()
+gamebox_action_bal()
 gamebox_draw()
 
 
