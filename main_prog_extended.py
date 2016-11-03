@@ -12,20 +12,39 @@ import sys
 gamebox = list()
 gamestate = 'not over'
 validmove = True
-score = 0
+
 
 def init():
     global gamebox
     os.system('cls' if os.name == 'nt' else 'clear')
-    gamebox = [[0,0,0,0],
-            [0,0,0,0],      
-            [0,0,0,0],           
-            [0,0,0,0]]
+    gamebox = [[0, 0, 0, 0],
+               [0, 0, 0, 0],
+               [0, 0, 0, 0],
+               [0, 0, 0, 0]]
     gamebox_random()
+
+
+def easy_win():
+    global gamebox
+    gamebox = [[0, 0, 0, 0],
+               [0, 0, 0, 0],
+               [0, 0, 0, 0],
+               [0, 0, 0, 2048]]
+
+
+def easy_lose():
+    global gamebox
+    gamebox = [[16, 8, 4, 2],
+               [8, 16, 8, 4],
+               [4, 8, 16, 8],
+               [2, 4, 8, 0]]
+
 
 #------------------------------------
 #        Logo print
 #------------------------------------
+
+
 def logo_print():
     os.system('cls' if os.name == 'nt' else 'clear')
     print("     `..--..`        ``.--..`             `...`      `..---.`         ")
@@ -38,8 +57,8 @@ def logo_print():
     print("  `-/ooo+-.....`  `+oo+-```/ooo: `+ooooooooooooo/ .ooo/`   .+oo+`     ")
     print("  `+ooooooooooo/   .+oooo+oooo:`  ````````.+oo:`` `:oooo+++ooo+.      ")
     print("  `------------.     .-://::-`            `---.     `.-:::::-.        ")
-    print("\n"*2) 
-    print("                   Press any key to start")                                                                
+    print("\n" * 2)
+    print("                   Press any key to start")
 
 
 #------------------------------------
@@ -47,16 +66,14 @@ def logo_print():
 #------------------------------------
 def gamebox_draw():
     os.system('cls' if os.name == 'nt' else 'clear')
-    print("Score: ", score)
-    print("\n")
-    for i in range(0,4):
-        for j in range(0,4):
+    for i in range(0, 4):
+        for j in range(0, 4):
             if j == 3:
-               print('\33[33m', '{:4d}'.format(gamebox[i][j]),'\x1b[0m', end="\n"*2)
+               print('\33[33m', '{:4d}'.format(gamebox[i][j]), '\x1b[0m', end="\n" * 2)
             else:
-               print('\33[33m', '{:4d}'.format(gamebox[i][j]),'\x1b[0m', end=" ")
+               print('\33[33m', '{:4d}'.format(gamebox[i][j]), '\x1b[0m', end=" ")
     print("\n")
-    
+
 
 #------------------------------------
 #  Ordering the items of the matrix
@@ -65,50 +82,53 @@ def gamebox_order_left():
     a = 0
     movement_happened = False
     while (a != 4):
-        for i in range(0,3):
-            for j in range(0,3):
-                if gamebox[a][j] == 0 and gamebox[a][j+1] !=0:
-                    gamebox[a][j] = gamebox[a][j+1]
-                    gamebox[a][j+1] = 0
+        for i in range(0, 3):
+            for j in range(0, 3):
+                if gamebox[a][j] == 0 and gamebox[a][j + 1] != 0:
+                    gamebox[a][j] = gamebox[a][j + 1]
+                    gamebox[a][j + 1] = 0
                     movement_happened = True
         a += 1
     return movement_happened
+
 
 def gamebox_order_right():
     a = 0
     movement_happened = False
     while (a != 4):
-        for i in range(0,3):
-            for j in reversed(range(1,4)):
-                if gamebox[a][j] == 0 and gamebox[a][j-1] !=0:
-                    gamebox[a][j] = gamebox[a][j-1]
-                    gamebox[a][j-1] = 0
+        for i in range(0, 3):
+            for j in reversed(range(1, 4)):
+                if gamebox[a][j] == 0 and gamebox[a][j - 1] != 0:
+                    gamebox[a][j] = gamebox[a][j - 1]
+                    gamebox[a][j - 1] = 0
                     movement_happened = True
         a += 1
     return movement_happened
 
+
 def gamebox_order_up():
     a = 0
     movement_happened = False
-    while (a !=4):
-        for j in range(0,3):
-                for i in (range(0,3)):
-                    if gamebox[i][a] == 0 and gamebox[i+1][a] !=0:
-                        gamebox[i][a] = gamebox[i+1][a]
-                        gamebox[i+1][a] = 0
+    while (a != 4):
+        for j in range(0, 3):
+                for i in (range(0, 3)):
+                    if gamebox[i][a] == 0 and gamebox[i + 1][a] != 0:
+                        gamebox[i][a] = gamebox[i + 1][a]
+                        gamebox[i + 1][a] = 0
                         movement_happened = True
         a += 1
     return movement_happened
 
+
 def gamebox_order_down():
     a = 0
     movement_happened = False
-    while (a !=4):
-        for j in range(0,3):
-                for i in reversed(range(1,4)):
-                    if gamebox[i][a] == 0 and gamebox[i-1][a] !=0:
-                        gamebox[i][a] = gamebox[i-1][a]
-                        gamebox[i-1][a] = 0
+    while (a != 4):
+        for j in range(0, 3):
+                for i in reversed(range(1, 4)):
+                    if gamebox[i][a] == 0 and gamebox[i - 1][a] != 0:
+                        gamebox[i][a] = gamebox[i - 1][a]
+                        gamebox[i - 1][a] = 0
                         movement_happened = True
         a += 1
     return movement_happened
@@ -118,71 +138,66 @@ def gamebox_order_down():
 #    Merging the items of the matrix
 #------------------------------------
 def gamebox_merge_left():
-    global score
     a = 0
     movement_happened = False
     while (a != 4):
-        for j in range(0,3):
-            if gamebox[a][j] == gamebox[a][j+1] and gamebox[a][j] !=0:
+        for j in range(0, 3):
+            if gamebox[a][j] == gamebox[a][j + 1] and gamebox[a][j] != 0:
                 gamebox[a][j] *= 2
-                score = score + gamebox[a][j]
-                gamebox[a][j+1] = 0
+                gamebox[a][j + 1] = 0
                 movement_happened = True
-        a += 1                
+        a += 1
     return movement_happened
+
 
 def gamebox_merge_right():
-    global score
     a = 0
     movement_happened = False
     while (a != 4):
-        for j in reversed(range(1,4)):
-            if gamebox[a][j] == gamebox[a][j-1] and gamebox[a][j] !=0:
+        for j in reversed(range(1, 4)):
+            if gamebox[a][j] == gamebox[a][j - 1] and gamebox[a][j] != 0:
                 gamebox[a][j] *= 2
-                score = score + gamebox[a][j]
-                gamebox[a][j-1] = 0
+                gamebox[a][j - 1] = 0
                 movement_happened = True
-        a += 1   
+        a += 1
     return movement_happened
 
+
 def gamebox_merge_up():
-    global score
     a = 0
     movement_happened = False
-    while (a !=4):
-        for i in (range(0,3)):
-                if gamebox[i][a] == gamebox[i+1][a] and gamebox[i][a]!=0: 
+    while (a != 4):
+        for i in (range(0, 3)):
+                if gamebox[i][a] == gamebox[i + 1][a] and gamebox[i][a] != 0:
                     gamebox[i][a] *= 2
-                    score = score + gamebox[i][a]
-                    gamebox[i+1][a] = 0
+                    gamebox[i + 1][a] = 0
                     movement_happened = True
         a += 1
     return movement_happened
 
 
 def gamebox_merge_down():
-    global score
     a = 0
     movement_happened = False
-    while (a !=4):
-        for i in reversed(range(1,4)):
-                if gamebox[i][a] == gamebox[i-1][a] and gamebox[i][a] !=0:
+    while (a != 4):
+        for i in reversed(range(1, 4)):
+                if gamebox[i][a] == gamebox[i - 1][a] and gamebox[i][a] != 0:
                     gamebox[i][a] *= 2
-                    score = score + gamebox[i][a]
-                    gamebox[i-1][a] = 0
+                    gamebox[i - 1][a] = 0
                     movement_happened = True
         a += 1
     return movement_happened
 
+
 def gamebox_order_down():
     a = 0
     movement_happened = False
-    while (a !=4):
-        for j in range(0,3):
-                for i in reversed(range(1,4)):
-                    if gamebox[i][a] == 0 and gamebox[i-1][a] !=0:
-                        gamebox[i][a] = gamebox[i-1][a]
-                        gamebox[i-1][a] = 0
+    while (a != 4):
+        for j in range(0, 3):
+                for i in reversed(range(1, 4)):
+                    if gamebox[i][a] == 0 and gamebox[i - 1][a] != 0:
+                        gamebox[i][a] = gamebox[i - 1][a]
+                        gamebox[i - 1][a] = 0
                         movement_happened = True
         a += 1
     return movement_happened
@@ -190,17 +205,21 @@ def gamebox_order_down():
 #------------------------------------
 #  Creating the random number in the matrix
 #------------------------------------
+
+
 def gamebox_random():
     while (True):
-        rnum1 = random.randrange(0,4)
-        rnum2 = random.randrange(0,4)
+        rnum1 = random.randrange(0, 4)
+        rnum2 = random.randrange(0, 4)
+        rlist = (2, 2, 2, 4)
         if gamebox[rnum1][rnum2] == 0:
-            gamebox[rnum1][rnum2] = 2
+            gamebox[rnum1][rnum2] = random.choice(rlist)
             break
 
 #------------------------------------
 #      Game states
 #------------------------------------
+
 
 def game_validate():
     global gamestate
@@ -211,66 +230,65 @@ def game_validate():
         gamebox_check_right()
         gamebox_check_down()
         gamebox_check_up()
-    if gamestate == 'over':
-        print("you have lost the game!")
-        sys.exit()
- 
+        if gamestate == 'over':
+            print("you have lost the game!")
+            sys.exit()
+
 
 def game_win():
     a = 0
-    while (a !=4):
+    while (a != 4):
         b = 0
-        while (b !=4):
+        while (b != 4):
             if gamebox[a][b] == 2048:
                 print ("you have won")
                 sys.exit()
             b += 1
         a += 1
 
+
 def gamebox_check_left():
     global gamestate
     a = 0
     while (a != 4):
-        for i in range(0,3):
-            for j in range(0,3):
-                if gamebox[a][j] == gamebox[a][j+1]:
-                    gamestate = 'not over'
-                    return gamestate
+        for j in range(0, 3):
+            if gamebox[a][j] == gamebox[a][j + 1]:
+                gamestate = 'not over'
+            return gamestate
         a += 1
+
 
 def gamebox_check_right():
     global gamestate
     a = 0
     while (a != 4):
-        for i in range(0,3):
-            for j in reversed(range(1,4)):
-                if gamebox[a][j] == gamebox[a][j-1]:
-                    gamestate = 'not over'
-                    return gamestate
-        a += 1   
+        for j in reversed(range(1, 4)):
+            if gamebox[a][j] == gamebox[a][j - 1]:
+                gamestate = 'not over'
+            return gamestate
+        a += 1
+
 
 def gamebox_check_down():
     global gamestate
     a = 0
-    while (a !=4):
-        for j in range(0,3):
-                for i in reversed(range(1,4)):
-                    if gamebox[i][a] == gamebox[i-1][a]:
-                        gamestate = 'not over'
-                        return gamestate
-        a += 1  
+    while (a != 4):
+        for i in reversed(range(1, 4)):
+            if gamebox[i][a] == gamebox[i - 1][a]:
+                gamestate = 'not over'
+            return gamestate
+        a += 1
+
 
 def gamebox_check_up():
     global gamestate
     a = 0
-    while (a !=4):
-        for j in range(0,3):
-                for i in (range(0,3)):
-                    if gamebox[i][a] == gamebox[i+1][a]:
-                        gamestate = 'not over'
-                        return gamestate                
+    while (a != 4):
+        for i in (range(0, 3)):
+            if gamebox[i][a] == gamebox[i + 1][a]:
+                gamestate = 'not over'
+            return gamestate
         a += 1
-
 
 
 #------------------------------------
@@ -320,8 +338,6 @@ def gamebox_action_right():
         validmove = True
 
 
-        
-
 #-----------------------------------------------------------
 
 #------------------------------------
@@ -338,7 +354,6 @@ while (userinput != "quit"):
     game_validate()
     while (True):
         userinput = input("Use WASD to move the blocks:")
-
         if userinput == 'w':
             gamebox_action_up()
             break
@@ -350,6 +365,12 @@ while (userinput != "quit"):
             break
         elif userinput == 'd':
             gamebox_action_right()
+            break
+        elif userinput == 'win':
+            easy_win()
+            break
+        elif userinput == 'lose':
+            easy_lose()
             break
         elif userinput == 'quit':
             sys.exit()
